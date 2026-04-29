@@ -3,188 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Calendar Pro | PRACHATIPAT</title>
+    <title>Prachatipat Hospital | Smart Calendar</title>
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
-        :root { 
-            --bg: #0d1117; --card: #161b22; --accent: #38bdf8; --text: #e6edf3; 
-            --pink: #f472b6; --blue: #38bdf8; --purple: #a78bfa; --orange: #fb923c; --green: #4ad399;
+        :root { --bg: #0d1117; --card: #161b22; --accent: #38bdf8; --text: #e6edf3; --pink: #f472b6; --holiday: #ff4757; }
+        * { box-sizing: border-box; font-family: 'Chakra Petch', sans-serif; transition: 0.2s; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 650px; }
+        
+        .header { text-align: center; margin: 15px 0; }
+        .header h2 { color: var(--accent); margin: 0; font-size: 1.5rem; text-transform: capitalize; }
+        #sync-status { font-size: 0.75rem; color: #fbbf24; margin-top: 5px; }
+
+        /* Calendar Style */
+        .calendar-card { background: var(--card); border-radius: 20px; padding: 15px; border: 1px solid #30363d; margin-bottom: 20px; width: 100%; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: var(--accent); }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+        .cal-day-head { font-size: 0.75rem; color: #8b949e; font-weight: bold; padding-bottom: 8px; }
+        
+        .cal-cell { 
+            background: #0d1117; min-height: 100px; border-radius: 10px; border: 1px solid #30363d; 
+            display: flex; flex-direction: column; align-items: center; padding: 4px; position: relative; cursor: pointer;
         }
-        * { box-sizing: border-box; font-family: 'Chakra Petch', sans-serif; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 480px; background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid #30363d; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .cal-cell.today { border: 2px solid var(--accent); }
+        .cal-cell.selected { background: rgba(56, 189, 248, 0.15); border-color: var(--accent); transform: scale(1.02); z-index: 5; }
         
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { color: var(--accent); font-size: 1.2rem; margin: 5px 0; letter-spacing: 1px; }
-        
-        label { display: block; font-size: 0.85rem; margin-bottom: 8px; color: #8b949e; font-weight: bold; text-transform: uppercase; }
-        select, input { width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 12px; color: white; padding: 15px; margin-bottom: 15px; outline: none; font-size: 1rem; }
+        .date-num { font-size: 0.95rem; font-weight: bold; margin-bottom: 2px; }
+        .holiday-label { font-size: 0.55rem; color: var(--holiday); font-weight: bold; margin-bottom: 4px; line-height: 1.1; }
+        .event-tag { 
+            font-size: 0.55rem; width: 100%; text-align: left; border-radius: 4px; margin-bottom: 2px;
+            padding: 2px 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
+        }
 
-        .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .q-btn { padding: 15px 5px; background: #21262d; border: 1px solid #30363d; border-radius: 14px; color: #8b949e; cursor: pointer; font-size: 0.9rem; text-align: center; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .q-btn span { font-size: 1.3rem; }
+        /* Input Form */
+        .input-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #30363d; width: 100%; margin-bottom: 20px; }
+        .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .q-btn { padding: 10px; background: #21262d; border: 1px solid #30363d; border-radius: 10px; color: #8b949e; cursor: pointer; text-align: center; font-size: 0.75rem; }
+        .q-btn.active { background: var(--accent); color: #000; font-weight: bold; }
+        .q-btn.active-นุ่น { background: var(--pink); color: #000; font-weight: bold; }
         
-        .q-btn.active-นุ่น { background: var(--pink); color: #000; border-color: var(--pink); box-shadow: 0 0 20px rgba(244, 114, 182, 0.4); }
-        .q-btn.active-พี่หมิว { background: var(--blue); color: #000; border-color: var(--blue); }
-        .q-btn.active-พี่ซานิ { background: var(--purple); color: #000; border-color: var(--purple); }
-        .q-btn.active-น้องฮาย { background: var(--orange); color: #000; border-color: var(--orange); }
-        .q-btn.active-พี่ออย { background: var(--green); color: #000; border-color: var(--green); }
-        .q-btn.active-time { background: #f8fafc; color: #000; border-color: #fff; transform: scale(1.05); }
-
-        .summary-box { background: rgba(255,255,255,0.02); padding: 18px; border-radius: 15px; border-left: 5px solid var(--accent); font-size: 1rem; margin-bottom: 25px; }
-        .main-btn { background: var(--accent); color: #0d1117; border: none; width: 100%; padding: 22px; border-radius: 18px; font-weight: 800; font-size: 1.2rem; cursor: pointer; box-shadow: 0 5px 20px rgba(56, 189, 248, 0.3); }
-        .main-btn:active { transform: scale(0.95); }
+        select, input { width: 100%; padding: 12px; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 10px; margin-bottom: 10px; outline: none; }
+        .main-btn { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        
+        .hist-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; margin: 10px 0; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center; }
+        .del-btn { color:#ff4757; cursor:pointer; font-weight:bold; font-size:0.8rem; background:rgba(255,71,87,0.1); padding:6px 12px; border-radius:8px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <span id="ai-status" style="font-size: 0.65rem; border: 1px solid var(--accent); padding: 3px 12px; border-radius: 20px; color: var(--accent); font-weight: bold;">SMART SYSTEM ACTIVE</span>
-        <h1 id="main-title">PRACHATIPAT HOSPITAL</h1>
+        <h2>Prachatipat Hospital</h2>
+        <div id="sync-status">🔄 กำลังโหลดข้อมูล...</div>
     </div>
 
-    <label>👩‍⚕️ STAFF (🐱 นุ่นสีชมพู)</label>
-    <div class="btn-grid" id="staffSelector">
-        <div class="q-btn active-นุ่น" onclick="setStaff('นุ่น (ไอตัวเล็ก)', this, '🐱')"><span>🐱</span>นุ่น</div>
-        <div class="q-btn" onclick="setStaff('พี่หมิว', this, '🐰')"><span>🐰</span>พี่หมิว</div>
-        <div class="q-btn" onclick="setStaff('พี่ซานิ', this, '🦊')"><span>🦊</span>พี่ซานิ</div>
-        <div class="q-btn" onclick="setStaff('น้องฮาย', this, '🐼')"><span>🐼</span>น้องฮาย</div>
-        <div class="q-btn" onclick="setStaff('พี่ออย', this, '🦁')"><span>🦁</span>พี่ออย</div>
+    <div class="calendar-card">
+        <div class="cal-header">
+            <button onclick="changeMonth(-1)" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">◀</button>
+            <strong id="monthLabel" style="font-size: 1.1rem;">เดือน</strong>
+            <button onclick="changeMonth(1)" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">▶</button>
+        </div>
+        <div class="cal-grid" id="calendarGrid"></div>
     </div>
 
-    <label>📝 ACTIVITY</label>
-    <select id="workType" onchange="hapticFeedback(20); updateSummary();">
-        <option value="อยู่เวร 🏥">อยู่เวรปกติ</option>
-        <option value="เวร 24 ชม. 🏥">เวร 24 ชั่วโมง</option>
-        <option value="ลาครึ่งวัน 🌓">ลาครึ่งวัน</option>
-        <option value="เข้าครึ่งวัน 🌗">เข้าครึ่งวัน</option>
-        <option value="OT ⚡">OT (ล่วงเวลา)</option>
-        <option value="ลาป่วย 🤒">ลาป่วย</option>
-        <option value="ลากิจ 📁">ลากิจ</option>
-    </select>
+    <div class="input-card">
+        <div id="selected-info" style="font-size:0.9rem; color:var(--accent); margin-bottom:12px; text-align:center; font-weight:bold; background:rgba(56,189,248,0.1); padding:8px; border-radius:10px;">📍 เลือกวันที่ในปฏิทิน</div>
+        
+        <div class="btn-grid" id="staffSelector">
+            <div class="q-btn active-นุ่น" onclick="setStaff('นุ่น', this)">นุ่น 🐱</div>
+            <div class="q-btn" onclick="setStaff('พี่หมิว', this)">พี่หมิว 🐰</div>
+            <div class="q-btn" onclick="setStaff('พี่ซานิ', this)">พี่ซานิ 🦊</div>
+            <div class="q-btn" onclick="setStaff('น้องฮาย', this)">น้องฮาย 🐼</div>
+            <div class="q-btn" onclick="setStaff('พี่ออย', this)">พี่ออย 🦁</div>
+        </div>
 
-    <label>📅 SELECT DATE (วัน)</label>
-    <div class="btn-grid" id="dateSelector">
-        <div class="q-btn active-time" onclick="quickDate(0, this)">วันนี้</div>
-        <div class="q-btn" onclick="quickDate(1, this)">พรุ่งนี้</div>
-        <div class="q-btn" onclick="quickDate(2, this)">มะรืนนี้</div>
+        <select id="workType">
+            <option value="อยู่เวร (เช้า)">อยู่เวร (เช้า)</option>
+            <option value="อยู่เวร (บ่าย)">อยู่เวร (บ่าย)</option>
+            <option value="อยู่เวร (ดึก)">อยู่เวร (ดึก)</option>
+            <option value="เวร 24 ชม.">เวร 24 ชม.</option>
+            <option value="ลาป่วย">ลาป่วย</option>
+            <option value="ลากิจ">ลากิจ</option>
+        </select>
+        
+        <input type="hidden" id="workDate">
+        <button class="main-btn" id="saveBtn" onclick="saveData()">เพิ่มลงตารางเวร</button>
     </div>
 
-    <label>⏰ SELECT SHIFT (กะทำงาน)</label>
-    <div class="btn-grid" id="timeSelector">
-        <div class="q-btn" onclick="quickTime(8, this)">เช้า (08:00)</div>
-        <div class="q-btn" onclick="quickTime(16, this)">บ่าย (16:00)</div>
-        <div class="q-btn" onclick="quickTime(0, this)">ดึก (00:00)</div>
-    </div>
-
-    <input type="datetime-local" id="startTime" onchange="updateSummary()">
-
-    <div class="summary-box" id="summary">✨ เลือกข้อมูลสรุป...</div>
-
-    <button class="main-btn" id="submitBtn" onclick="exportToIOS()">📅 SEND TO IPHONE</button>
+    <div id="scheduleList"></div>
 </div>
 
 <script>
-    let selectedStaff = "นุ่น (ไอตัวเล็ก)";
-    let selectedIcon = "🐱";
-    let currentDate = new Date();
-    const colors = { 'นุ่น (ไอตัวเล็ก)': '#f472b6', 'พี่หมิว': '#38bdf8', 'พี่ซานิ': '#a78bfa', 'น้องฮาย': '#fb923c', 'พี่ออย': '#4ad399' };
+    // --- สำคัญมาก: ใส่ URL ของ Google Apps Script ของคุณที่นี่ ---
+    const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbyr-kRXe2_OQqCsgvHXbz8OiOhtJCRVmy3eGCQ3sQbL1SLsPAf5vnusEJrbOR4kTtr_Pw/exec';
+    
+    let db = [];
+    let currentStaff = "นุ่น";
+    let selectedDate = new Date().toISOString().split('T')[0];
+    let viewDate = new Date();
 
-    function hapticFeedback(ms = 15) {
-        if (window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(ms);
-        }
-    }
+    const staffInfo = {
+        'นุ่น': { icon: '🐱', color: '#f472b6' },
+        'พี่หมิว': { icon: '🐰', color: '#38bdf8' },
+        'พี่ซานิ': { icon: '🦊', color: '#a78bfa' },
+        'น้องฮาย': { icon: '🐼', color: '#fb923c' },
+        'พี่ออย': { icon: '🦁', color: '#34d399' }
+    };
 
-    function setStaff(name, el, icon) {
-        hapticFeedback(20);
-        selectedStaff = name;
-        selectedIcon = icon;
-        resetBtns('staffSelector');
-        const shortName = name.includes("นุ่น") ? "นุ่น" : name;
-        el.classList.add('active-' + shortName);
-        const color = colors[name];
-        document.getElementById('ai-status').style.color = color;
-        document.getElementById('ai-status').style.borderColor = color;
-        document.getElementById('main-title').style.color = color;
-        document.getElementById('submitBtn').style.background = color;
-        document.getElementById('summary').style.borderColor = color;
-        updateSummary();
-    }
+    function getHoliday(dateStr) {
+        const d = new Date(dateStr);
+        const mmdd = (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getDate().toString().padStart(2, '0');
+        const dayOfWeek = d.getDay(); 
 
-    function quickDate(days, el) {
-        hapticFeedback(15);
-        let d = new Date();
-        d.setDate(d.getDate() + days);
-        currentDate.setFullYear(d.getFullYear(), d.getMonth(), d.getDate());
-        resetBtns('dateSelector');
-        el.classList.add('active-time');
-        updateInput();
-    }
-
-    function quickTime(hour, el) {
-        hapticFeedback(30);
-        currentDate.setHours(hour, 0, 0, 0);
-        resetBtns('timeSelector');
-        el.classList.add('active-time');
-        updateInput();
-    }
-
-    function updateInput() {
-        const offset = currentDate.getTimezoneOffset() * 60000;
-        const localISOTime = new Date(currentDate - offset).toISOString().slice(0, 16);
-        document.getElementById('startTime').value = localISOTime;
-        updateSummary();
-    }
-
-    function resetBtns(parentId) {
-        document.getElementById(parentId).querySelectorAll('.q-btn').forEach(btn => { btn.className = 'q-btn'; });
-    }
-
-    function updateSummary() {
-        const type = document.getElementById('workType').value;
-        const time = document.getElementById('startTime').value;
-        if(!time) return;
-        const dateStr = new Date(time).toLocaleDateString('th-TH', { day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
-        document.getElementById('summary').innerHTML = `<span style="color:${colors[selectedStaff]}">${selectedIcon} <b>${selectedStaff}</b></span><br>📌 ${type}<br>🗓️ ${dateStr}`;
-    }
-
-    function exportToIOS() {
-        hapticFeedback(50);
-        const time = document.getElementById('startTime').value;
-        const type = document.getElementById('workType').value;
-        if(!time) return alert("กรุณาเลือกวันที่");
-
-        const start = new Date(time);
-        
-        // --- ระบบคำนวณระยะเวลาแบบไดนามิก ---
-        let duration = 8; // ปกติ 8 ชม.
-        if (type.includes("24 ชม.")) duration = 24;
-        else if (type.includes("ครึ่งวัน")) duration = 4; // ลา/เข้า ครึ่งวัน = 4 ชม.
-
-        const end = new Date(start.getTime() + duration * 60 * 60 * 1000); 
-        
-        const formatLocal = (d) => {
-            const pad = (n) => n < 10 ? '0' + n : n;
-            return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
+        const fixedHolidays = {
+            "01-01": "วันขึ้นปีใหม่", "04-06": "วันจักรี", "04-13": "วันสงกรานต์", "04-14": "วันสงกรานต์",
+            "04-15": "วันสงกรานต์", "05-01": "วันแรงงาน", "05-04": "วันฉัตรมงคล", "06-03": "วันราชินี",
+            "07-28": "วัน ร.10", "08-12": "วันแม่", "10-13": "วัน ร.9", "10-23": "วันปิยมหาราช",
+            "12-05": "วันพ่อ", "12-10": "วันรัฐธรรมนูญ", "12-31": "วันสิ้นปี"
         };
 
-        const ics = [
-            "BEGIN:VCALENDAR", "VERSION:2.0", "BEGIN:VEVENT",
-            `SUMMARY:${selectedIcon} ${selectedStaff}: ${type}`,
-            `DTSTART:${formatLocal(start)}`, `DTEND:${formatLocal(end)}`,
-            `LOCATION:โรงพยาบาลประชาธิปัตย์`, `DESCRIPTION:บันทึกโดยระบบ AI Smart Calendar`,
-            "BEGIN:VALARM", "TRIGGER:-PT30M", "ACTION:DISPLAY", "END:VALARM",
-            "END:VEVENT", "END:VCALENDAR"
-        ].join("\n");
+        if (fixedHolidays[mmdd]) return fixedHolidays[mmdd];
 
-        const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url; a.download = `${selectedStaff}-work.ics`; a.click();
+        if (dayOfWeek === 1) { 
+            const sun = new Date(d); sun.setDate(d.getDate() - 1);
+            const sat = new Date(d); sat.setDate(d.getDate() - 2);
+            const sunKey = (sun.getMonth() + 1).toString().padStart(2, '0') + '-' + sun.getDate().toString().padStart(2, '0');
+            const satKey = (sat.getMonth() + 1).toString().padStart(2, '0') + '-' + sat.getDate().toString().padStart(2, '0');
+            if (fixedHolidays[sunKey] || fixedHolidays[satKey]) return "ชดเชยวันหยุด";
+        }
+        return null;
     }
-    updateInput();
+
+    function setStaff(name, el) {
+        currentStaff = name;
+        document.querySelectorAll('#staffSelector .q-btn').forEach(b => b.classList.remove('active', 'active-นุ่น'));
+        el.classList.add(name === 'นุ่น' ? 'active-นุ่น' : 'active');
+        document.getElementById('saveBtn').style.background = staffInfo[name].color;
+    }
+
+    async function pullData() {
+        if (!GOOGLE_URL) return;
+        try {
+            const res = await fetch(GOOGLE_URL);
+            db = await res.json();
+            document.getElementById('sync-status').innerHTML = '✅ ข้อมูลอัปเดตล่าสุด';
+            render();
+        } catch (e) { document.getElementById('sync-status').innerHTML = '❌ เชื่อมต่อไม่ได้'; }
+    }
+
+    function selectDate(date) {
+        selectedDate = date;
+        document.getElementById('workDate').value = date;
+        const d = new Date(date).toLocaleDateString('th-TH', { day:'numeric', month:'short' });
+        document.getElementById('selected-info').innerText = `📍 วันที่เลือก: ${d}`;
+        render();
+    }
+
+    async function saveData() {
+        const type = document.getElementById('workType').value;
+        const date = selectedDate;
+        if(!date) return alert("เลือกวันที่ก่อนครับ");
+        const entry = { id: Date.now().toString(), owner: currentStaff, type: type, date: date };
+        db.push(entry); render();
+        await fetch(GOOGLE_URL, { method: 'POST', body: JSON.stringify(entry), mode: 'no-cors' });
+        pullData();
+    }
+
+    async function del(id) {
+        if(!confirm('ลบรายการนี้?')) return;
+        db = db.filter(i => i.id != id); render();
+        await fetch(`${GOOGLE_URL}?action=delete&id=${id}`, { mode: 'no-cors' });
+        pullData();
+    }
+
+    function changeMonth(val) { viewDate.setMonth(viewDate.getMonth() + val); render(); }
+
+    function render() {
+        const grid = document.getElementById('calendarGrid');
+        const monthLabel = document.getElementById('monthLabel');
+        grid.innerHTML = '';
+        const days = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+        days.forEach(d => grid.innerHTML += `<div class="cal-day-head">${d}</div>`);
+        monthLabel.innerText = viewDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+        const firstDay = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
+        const lastDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+        for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
+        for(let d=1; d<=lastDate; d++) {
+            const dateStr = `${viewDate.getFullYear()}-${String(viewDate.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const isToday = new Date().toISOString().split('T')[0] === dateStr;
+            const isSelected = selectedDate === dateStr;
+            const holidayName = getHoliday(dateStr);
+            const dayEvents = db.filter(i => i.date && i.date.startsWith(dateStr));
+            let eventHtml = dayEvents.map(e => {
+                const info = staffInfo[e.owner] || { icon: '📍', color: '#666' };
+                const isLeave = e.type.includes('ลา');
+                const bgColor = isLeave ? '#ff475722' : `${info.color}22`;
+                const textColor = isLeave ? '#ff4757' : info.color;
+                return `<div class="event-tag" style="background:${bgColor}; color:${textColor}; border-left: 2px solid ${textColor}">
+                    ${info.icon}${e.owner}: ${e.type.replace('อยู่เวร','เวร')}
+                </div>`;
+            }).join('');
+            grid.innerHTML += `
+                <div class="cal-cell ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}" onclick="selectDate('${dateStr}')">
+                    <span class="date-num" style="color:${holidayName ? 'var(--holiday)' : 'inherit'}">${d}</span>
+                    <div class="holiday-label">${holidayName || ''}</div>
+                    <div style="width:100%; overflow:hidden;">${eventHtml}</div>
+                </div>`;
+        }
+        const list = document.getElementById('scheduleList');
+        const filtered = db.filter(i => i.date === selectedDate);
+        list.innerHTML = `<h4 style="margin:10px 0; color:#8b949e; border-bottom: 1px solid #333; padding-bottom:5px;">📅 รายการวันที่เลือก (${filtered.length})</h4>`;
+        filtered.forEach(i => {
+            const info = staffInfo[i.owner] || { icon: '❓', color: '#666' };
+            list.innerHTML += `<div class="hist-item" style="border-left-color:${info.color}">
+                <div><strong>${info.icon} ${i.owner}</strong><br><small style="color:var(--accent)">${i.type}</small></div>
+                <div onclick="del('${i.id}')" class="del-btn">ลบ</div>
+            </div>`;
+        });
+    }
+    pullData();
+    setInterval(pullData, 30000);
 </script>
 </body>
 </html>
