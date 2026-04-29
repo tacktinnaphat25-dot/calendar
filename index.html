@@ -15,34 +15,33 @@
         .container { width: 100%; max-width: 480px; background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid #30363d; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
         
         .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { color: var(--accent); font-size: 1.3rem; margin: 5px 0; letter-spacing: 1px; }
+        .header h1 { color: var(--accent); font-size: 1.2rem; margin: 5px 0; letter-spacing: 1px; }
         
-        label { display: block; font-size: 0.85rem; margin-bottom: 8px; color: #8b949e; font-weight: bold; }
-        select, input { width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 12px; color: white; padding: 12px; margin-bottom: 15px; outline: none; font-size: 1rem; }
+        label { display: block; font-size: 0.85rem; margin-bottom: 8px; color: #8b949e; font-weight: bold; text-transform: uppercase; }
+        select, input { width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 12px; color: white; padding: 15px; margin-bottom: 15px; outline: none; font-size: 1rem; }
 
-        .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .q-btn { padding: 12px 5px; background: #21262d; border: 1px solid #30363d; border-radius: 12px; color: #8b949e; cursor: pointer; font-size: 0.85rem; text-align: center; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .q-btn span { font-size: 1.2rem; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .q-btn { padding: 15px 5px; background: #21262d; border: 1px solid #30363d; border-radius: 14px; color: #8b949e; cursor: pointer; font-size: 0.9rem; text-align: center; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .q-btn span { font-size: 1.3rem; }
         
         .q-btn.active-นุ่น { background: var(--pink); color: #000; border-color: var(--pink); box-shadow: 0 0 20px rgba(244, 114, 182, 0.4); }
-        .q-btn.active-นุ่น span { filter: drop-shadow(0 0 8px rgba(0,0,0,0.5)); }
         .q-btn.active-พี่หมิว { background: var(--blue); color: #000; border-color: var(--blue); }
         .q-btn.active-พี่ซานิ { background: var(--purple); color: #000; border-color: var(--purple); }
         .q-btn.active-น้องฮาย { background: var(--orange); color: #000; border-color: var(--orange); }
         .q-btn.active-พี่ออย { background: var(--green); color: #000; border-color: var(--green); }
-        .q-btn.active-time { background: #f8fafc; color: #000; border-color: #fff; }
+        .q-btn.active-time { background: #f8fafc; color: #000; border-color: #fff; transform: scale(1.05); }
 
-        .summary-box { background: rgba(255,255,255,0.02); padding: 18px; border-radius: 15px; border-left: 5px solid var(--accent); font-size: 0.95rem; margin-bottom: 20px; position: relative; overflow: hidden; }
-        .main-btn { background: var(--accent); color: #0d1117; border: none; width: 100%; padding: 20px; border-radius: 16px; font-weight: 700; font-size: 1.1rem; cursor: pointer; }
-        .main-btn:active { transform: scale(0.96); }
+        .summary-box { background: rgba(255,255,255,0.02); padding: 18px; border-radius: 15px; border-left: 5px solid var(--accent); font-size: 1rem; margin-bottom: 25px; }
+        .main-btn { background: var(--accent); color: #0d1117; border: none; width: 100%; padding: 22px; border-radius: 18px; font-weight: 800; font-size: 1.2rem; cursor: pointer; box-shadow: 0 5px 20px rgba(56, 189, 248, 0.3); }
+        .main-btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <span id="ai-status" style="font-size: 0.65rem; border: 1px solid var(--accent); padding: 2px 10px; border-radius: 20px; color: var(--accent); text-transform: uppercase; font-weight: bold;">Smart AI Active</span>
-        <h1 id="main-title">CALENDAR HOSPITAL</h1>
+        <span id="ai-status" style="font-size: 0.65rem; border: 1px solid var(--accent); padding: 3px 12px; border-radius: 20px; color: var(--accent); font-weight: bold;">SMART SYSTEM ACTIVE</span>
+        <h1 id="main-title">PRACHATIPAT HOSPITAL</h1>
     </div>
 
     <label>👩‍⚕️ STAFF (🐱 นุ่นสีชมพู)</label>
@@ -55,24 +54,24 @@
     </div>
 
     <label>📝 ACTIVITY</label>
-    <select id="workType" onchange="hapticFeedback(); updateSummary();">
+    <select id="workType" onchange="hapticFeedback(20); updateSummary();">
         <option value="อยู่เวร 🏥">อยู่เวรปกติ</option>
         <option value="เวร 24 ชม. 🏥">เวร 24 ชั่วโมง</option>
+        <option value="ลาครึ่งวัน 🌓">ลาครึ่งวัน</option>
+        <option value="เข้าครึ่งวัน 🌗">เข้าครึ่งวัน</option>
         <option value="OT ⚡">OT (ล่วงเวลา)</option>
-        <option value="ลาหยุด 🏠">ลาหยุดปกติ</option>
         <option value="ลาป่วย 🤒">ลาป่วย</option>
         <option value="ลากิจ 📁">ลากิจ</option>
-        <option value="ลาคลอด 🤱">ลาคลอด</option>
     </select>
 
-    <label>📅 QUICK DATE</label>
+    <label>📅 SELECT DATE (วัน)</label>
     <div class="btn-grid" id="dateSelector">
         <div class="q-btn active-time" onclick="quickDate(0, this)">วันนี้</div>
         <div class="q-btn" onclick="quickDate(1, this)">พรุ่งนี้</div>
         <div class="q-btn" onclick="quickDate(2, this)">มะรืนนี้</div>
     </div>
 
-    <label>⏰ SHIFT TIME</label>
+    <label>⏰ SELECT SHIFT (กะทำงาน)</label>
     <div class="btn-grid" id="timeSelector">
         <div class="q-btn" onclick="quickTime(8, this)">เช้า (08:00)</div>
         <div class="q-btn" onclick="quickTime(16, this)">บ่าย (16:00)</div>
@@ -92,30 +91,14 @@
     let currentDate = new Date();
     const colors = { 'นุ่น (ไอตัวเล็ก)': '#f472b6', 'พี่หมิว': '#38bdf8', 'พี่ซานิ': '#a78bfa', 'น้องฮาย': '#fb923c', 'พี่ออย': '#4ad399' };
 
-    // สร้างเสียงปิ๊งแบบ AI
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playDing() {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.2);
-    }
-
-    function hapticFeedback() {
+    function hapticFeedback(ms = 15) {
         if (window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(15); // สั่น 15ms
+            window.navigator.vibrate(ms);
         }
     }
 
     function setStaff(name, el, icon) {
-        hapticFeedback();
-        playDing();
+        hapticFeedback(20);
         selectedStaff = name;
         selectedIcon = icon;
         resetBtns('staffSelector');
@@ -131,7 +114,7 @@
     }
 
     function quickDate(days, el) {
-        hapticFeedback();
+        hapticFeedback(15);
         let d = new Date();
         d.setDate(d.getDate() + days);
         currentDate.setFullYear(d.getFullYear(), d.getMonth(), d.getDate());
@@ -141,7 +124,7 @@
     }
 
     function quickTime(hour, el) {
-        hapticFeedback();
+        hapticFeedback(30);
         currentDate.setHours(hour, 0, 0, 0);
         resetBtns('timeSelector');
         el.classList.add('active-time');
@@ -168,14 +151,20 @@
     }
 
     function exportToIOS() {
-        hapticFeedback();
+        hapticFeedback(50);
         const time = document.getElementById('startTime').value;
         const type = document.getElementById('workType').value;
         if(!time) return alert("กรุณาเลือกวันที่");
 
         const start = new Date(time);
-        const duration = type.includes("24 ชม.") ? 24 : 8;
+        
+        // --- ระบบคำนวณระยะเวลาแบบไดนามิก ---
+        let duration = 8; // ปกติ 8 ชม.
+        if (type.includes("24 ชม.")) duration = 24;
+        else if (type.includes("ครึ่งวัน")) duration = 4; // ลา/เข้า ครึ่งวัน = 4 ชม.
+
         const end = new Date(start.getTime() + duration * 60 * 60 * 1000); 
+        
         const formatLocal = (d) => {
             const pad = (n) => n < 10 ? '0' + n : n;
             return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
