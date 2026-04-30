@@ -95,7 +95,7 @@
 
 <script>
     // --- สำคัญมาก: ใส่ URL ของ Google Apps Script ของคุณที่นี่ ---
-    const GOOGLE_URL = '';
+    const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzZ3XN6dsWVgpVX6OlHCMpJuM774fytIsxaSrr_ZlWogiTmPqmeQkV6PZMAIO3CvyWGgA/exec';
     
     let db = [];
     let currentStaff = "นุ่น";
@@ -170,11 +170,34 @@
     }
 
     async function del(id) {
-        if(!confirm('ลบรายการนี้?')) return;
-        db = db.filter(i => i.id != id); render();
-        await fetch(`${GOOGLE_URL}?action=delete&id=${id}`, { mode: 'no-cors' });
-        pullData();
+    if(!confirm('ต้องการลบรายการนี้ใช่หรือไม่?')) return;
+    
+    // อัปเดต UI ทันทีเพื่อให้ดูเร็วขึ้น
+    db = db.filter(i => String(i.id) !== String(id)); 
+    render();
+    
+    document.getElementById('sync-status').innerHTML = '🔄 กำลังลบข้อมูลจากระบบ...';
+
+    try {
+        await fetch(GOOGLE_URL, { 
+            method: 'POST', // เปลี่ยนจาก GET เป็น POST
+            mode: 'no-cors', 
+            body: JSON.stringify({ 
+                action: 'delete', // ส่ง action ไปบอก Apps Script
+            id: String(id)
+            }) 
+        });
+        
+        // รอสักครู่แล้วดึงข้อมูลใหม่เพื่อยืนยันการลบ
+        setTimeout(async () => {
+    await pullData();
+    render();
+    }, 1500); 
+    } catch (e) {
+        console.error(e);
+        document.getElementById('sync-status').innerHTML = '❌ ลบไม่สำเร็จ';
     }
+}
 
     function changeMonth(val) { viewDate.setMonth(viewDate.getMonth() + val); render(); }
 
@@ -211,7 +234,7 @@
                 </div>`;
         }
         const list = document.getElementById('scheduleList');
-        const filtered = db.filter(i => i.date === selectedDate);
+        const filtered = db.filter(i => i.date && i.date.toString().startsWith(selectedDate));
         list.innerHTML = `<h4 style="margin:10px 0; color:#8b949e; border-bottom: 1px solid #333; padding-bottom:5px;">📅 รายการวันที่เลือก (${filtered.length})</h4>`;
         filtered.forEach(i => {
             const info = staffInfo[i.owner] || { icon: '❓', color: '#666' };
